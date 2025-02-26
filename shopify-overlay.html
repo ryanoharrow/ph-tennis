@@ -37,27 +37,27 @@
                 const data = await response.json();
                 const product = data.product;
 
-                // Ensure the image exists
-                if (product.images && product.images.length > 0) {
-                    // Set the product details in the overlay
+                // Debugging: Log the full product data to inspect it
+                console.log(product);
+
+                // Set the title
+                if (product.title) {
                     document.getElementById('product-title').innerText = product.title;
-                    document.getElementById('product-price').innerText = `Price: $${product.variants[0].price}`;
+                } else {
+                    document.getElementById('product-title').innerText = "Title Not Available";
+                }
+
+                // Set the image (first image in the array)
+                if (product.images && product.images.length > 0) {
+                    document.getElementById('product-image').src = product.images[0].src;
+                    document.getElementById('product-price').innerText = `Price: £${product.variants[0].price}`;
 
                     // Show the product container after it loads
                     document.getElementById('product-container').style.display = "block";
-
-                    // Set up an image cycling function
-                    let currentImageIndex = 0;
-                    function cycleImages() {
-                        setInterval(() => {
-                            currentImageIndex = (currentImageIndex + 1) % product.images.length;
-                            document.getElementById('product-image').src = product.images[currentImageIndex].src;
-                        }, 5000);  // Change image every 5 seconds
-                    }
-                    cycleImages();
                 } else {
                     document.getElementById('product-title').innerText = "Image Not Available";
                 }
+
             } catch (error) {
                 console.error("Error fetching product:", error);
                 document.getElementById('product-title').innerText = "Error loading product";
