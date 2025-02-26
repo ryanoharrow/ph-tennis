@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Product Overlay with Input</title>
+    <title>Product Overlay</title>
     <style>
         body {
             font-family: Arial, sans-serif;
@@ -58,12 +58,11 @@
             font-size: 16px;
             color: green;
         }
-
     </style>
 </head>
 <body>
 
-    <!-- Product Name Input -->
+    <!-- Input to enter product name -->
     <h2>Enter the Product Name</h2>
     <input type="text" id="productNameInput" placeholder="Enter product name (e.g. babolat-pure-drive-2025)">
     <button id="saveButton">Save Product</button>
@@ -77,7 +76,7 @@
     </div>
 
     <script>
-        // Function to save the product name to localStorage
+        // Function to save the product name to localStorage and fetch the product
         document.getElementById('saveButton').addEventListener('click', function() {
             const productName = document.getElementById('productNameInput').value.trim();
             if (productName) {
@@ -90,7 +89,7 @@
             }
         });
 
-        // Fetch product data from Shopify API
+        // Function to fetch product data from Shopify API
         async function fetchProduct() {
             const productName = localStorage.getItem('productName');
             if (!productName) {
