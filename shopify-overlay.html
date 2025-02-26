@@ -12,7 +12,7 @@
             background: transparent;
         }
         #product-container {
-            display: none;
+            display: block;
             padding: 10px;
             border-radius: 10px;
         }
@@ -24,47 +24,53 @@
 </head>
 <body>
 
-    <h2 id="product-title">Loading...</h2>
-    <img id="product-image" src="" alt="Product Image">
-    <h3 id="product-price"></h3>
+    <div id="product-container">
+        <h2 id="product-title">Loading...</h2>
+        <img id="product-image" src="" alt="Product Image" style="display:none;">
+        <h3 id="product-price">Price: Loading...</h3>
+    </div>
 
     <script>
         async function fetchProduct() {
-            const url = "https://primal-health-sports-academy.myshopify.com/products/babolat-pure-drive-2025.json"; // Replace with your actual product handle
+            const url = "https://primal-health-sports-academy.myshopify.com/products/babolat-pure-drive-2025.json"; // Correct the URL with your product handle
 
             try {
                 const response = await fetch(url);
                 const data = await response.json();
                 const product = data.product;
 
-                // Debugging: Log the full product data to inspect it
-                console.log(product);
-
-                // Set the title
+                // Check if the product title exists and update
                 if (product.title) {
-                    document.getElementById('product-title').innerText = product.title;
+                    document.getElementById('title').innerText = product.title;
                 } else {
                     document.getElementById('product-title').innerText = "Title Not Available";
                 }
 
-                // Set the image (first image in the array)
-                if (product.images && product.images.length > 0) {
-                    document.getElementById('product-image').src = product.images[0].src;
-                    document.getElementById('product-price').innerText = `Price: £${product.variants[0].price}`;
-
-                    // Show the product container after it loads
-                    document.getElementById('product-container').style.display = "block";
+                // Set the price
+                if (product.variants && product.variants[0].price) {
+                    document.getElementById('price').innerText = `Price: £${product.variants[0].price}`;
                 } else {
-                    document.getElementById('product-title').innerText = "Image Not Available";
+                    document.getElementById('price').innerText = "Price Not Available";
+                }
+
+                // Set the product image (using the first image URL)
+                if (product.images && product.images.length > 0) {
+                    const imageUrl = product.images[0].src;
+                    const productImage = document.getElementById('image');
+                    productImage.src = imageUrl;
+                    productImage.style.display = "block"; // Show image once the URL is set
+                } else {
+                    document.getElementById('image').style.display = "none"; // Hide image if not available
                 }
 
             } catch (error) {
                 console.error("Error fetching product:", error);
                 document.getElementById('product-title').innerText = "Error loading product";
+                document.getElementById('product-price').innerText = "Error loading price";
             }
         }
 
-        // Fetch product data on page load
+        // Run fetchProduct on page load
         fetchProduct();
     </script>
 
