@@ -3,105 +3,125 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Shopify Product Overlay</title>
+    <title>Product Overlay with Input</title>
     <style>
         body {
             font-family: Arial, sans-serif;
-            color: black;
+            background-color: transparent;
+            color: white;
             text-align: center;
-            background: #f4f4f4;
             padding: 20px;
-            margin: 0;
         }
+
         #product-container {
             display: none;
             padding: 20px;
-            border: 1px solid #ddd;
+            background-color: rgba(0, 0, 0, 0.7);
             border-radius: 10px;
-            background-color: white;
-            box-shadow: 0px 0px 10px rgba(0, 0, 0, 0.1);
-            max-width: 400px; /* Set max width for better scaling */
+            max-width: 400px;
             margin: 0 auto;
         }
+
         img {
             max-width: 100%;
-            height: auto; /* Ensure image keeps its aspect ratio */
+            height: auto;
             border-radius: 10px;
         }
-        h2 {
-            font-size: 24px; /* Slightly smaller font size for better scaling */
+
+        h2, h3 {
             margin: 10px 0;
         }
-        h3 {
-            font-size: 20px; /* Smaller font size for price */
-            margin: 5px 0;
+
+        #productNameInput {
+            padding: 10px;
+            font-size: 16px;
+            width: 80%;
+            max-width: 300px;
+            margin: 10px 0;
         }
-        @media (max-width: 1024px) {
-            #product-container {
-                max-width: 80%; /* Adjust container width on smaller screens like tablets */
-            }
+
+        button {
+            padding: 10px 20px;
+            font-size: 16px;
+            background-color: #4CAF50;
+            color: white;
+            border: none;
+            cursor: pointer;
         }
+
+        button:hover {
+            background-color: #45a049;
+        }
+
+        .message {
+            margin-top: 20px;
+            font-size: 16px;
+            color: green;
+        }
+
     </style>
 </head>
 <body>
 
-    <h2 id="product-title">Loading...</h2>
+    <!-- Product Name Input -->
+    <h2>Enter the Product Name</h2>
+    <input type="text" id="productNameInput" placeholder="Enter product name (e.g. babolat-pure-drive-2025)">
+    <button id="saveButton">Save Product</button>
+    <p class="message" id="message"></p>
+
+    <!-- Product Display -->
     <div id="product-container">
+        <h2 id="product-title">Loading...</h2>
         <img id="product-image" src="" alt="Product Image">
         <h3 id="product-price"></h3>
     </div>
-    <p id="error-message" class="error"></p>
 
     <script>
-        // Function to fetch the product data from Shopify
-        async function fetchProductData() {
-            const url = "https://primal-health-sports-academy.myshopify.com/products/babolat-pure-drive-2025.json"; // Replace with your actual product handle
+        // Function to save the product name to localStorage
+        document.getElementById('saveButton').addEventListener('click', function() {
+            const productName = document.getElementById('productNameInput').value.trim();
+            if (productName) {
+                localStorage.setItem('productName', productName);
+                document.getElementById('message').innerText = "Product saved successfully!";
+                document.getElementById('productNameInput').value = ''; // Clear input field
+                fetchProduct(); // Fetch the product immediately after saving
+            } else {
+                document.getElementById('message').innerText = "Please enter a valid product name.";
+            }
+        });
+
+        // Fetch product data from Shopify API
+        async function fetchProduct() {
+            const productName = localStorage.getItem('productName');
+            if (!productName) {
+                document.getElementById('product-title').innerText = "No product name found. Please enter it above.";
+                return;
+            }
+
+            const url = `https://your-store.myshopify.com/products/${productName}.json`; // Replace with your Shopify store URL
 
             try {
-                // Fetch the product data
                 const response = await fetch(url);
-                if (!response.ok) {
-                    throw new Error("Network response was not ok.");
-                }
-
                 const data = await response.json();
-                console.log("Fetched data:", data); // Debug: Check the fetched data
-
                 const product = data.product;
-                if (product) {
-                    // Set the product title
-                    document.getElementById('product-title').innerText = product.title || "Product Title Not Available";
-                    
-                    // Set the product price
-                    document.getElementById('product-price').innerText = `Price: £${product.variants[0].price || "N/A"}`;
-                    
-                    // Set the product image (if available)
-                    if (product.images && product.images.length > 0) {
-                        document.getElementById('product-image').src = product.images[0].src;
-                    } else {
-                        document.getElementById('product-image').alt = "No Image Available";
-                    }
 
-                    // Show the product container
-                    document.getElementById('product-container').style.display = "block";
-                    document.getElementById('error-message').innerText = ""; // Clear any previous error message
+                if (product) {
+                    // Set product details
+                    document.getElementById('product-title').innerText = product.title || "Title not available";
+                    document.getElementById('product-image').src = product.images && product.images.length > 0 ? product.images[0].src : "";
+                    document.getElementById('product-price').innerText = product.variants && product.variants.length > 0 ? `Price: £${product.variants[0].price}` : "Price not available";
+                    document.getElementById('product-container').style.display = "block"; // Show the product container
                 } else {
-                    showError("Product data is missing or invalid.");
+                    document.getElementById('product-title').innerText = "Product not found.";
                 }
             } catch (error) {
-                showError("Error loading product data. Please try again later.");
-                console.error("Error fetching product data:", error); // Debug: Log the error
+                console.error("Error fetching product:", error);
+                document.getElementById('product-title').innerText = "Error loading product.";
             }
         }
 
-        // Display an error message if something goes wrong
-        function showError(message) {
-            document.getElementById('error-message').innerText = message;
-            document.getElementById('product-container').style.display = "none"; // Hide product details in case of error
-        }
-
-        // Fetch product data when the page loads
-        window.onload = fetchProductData;
+        // Fetch product data on page load if product name exists in localStorage
+        window.onload = fetchProduct;
     </script>
 
 </body>
