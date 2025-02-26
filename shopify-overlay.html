@@ -48,19 +48,19 @@
 
                 // Set the price
                 if (product.variants && product.variants[0].price) {
-                    document.getElementById('product-price').innerText = `Price: £${product.variants[0].price}`;
+                    document.getElementById('price').innerText = `Price: £${product.variants[0].price}`;
                 } else {
-                    document.getElementById('product-price').innerText = "Price Not Available";
+                    document.getElementById('price').innerText = "Price Not Available";
                 }
 
                 // Set the product image (using the first image URL)
                 if (product.images && product.images.length > 0) {
                     const imageUrl = product.images[0].src;
-                    const productImage = document.getElementById('product-image');
+                    const productImage = document.getElementById('image');
                     productImage.src = imageUrl;
                     productImage.style.display = "block"; // Show image once the URL is set
                 } else {
-                    document.getElementById('product-image').style.display = "none"; // Hide image if not available
+                    document.getElementById('image').style.display = "none"; // Hide image if not available
                 }
 
             } catch (error) {
