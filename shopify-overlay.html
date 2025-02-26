@@ -1,0 +1,64 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Shopify Product Overlay</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            color: white;
+            text-align: center;
+            background: transparent;
+        }
+        #product-container {
+            display: none;
+            padding: 10px;
+            border-radius: 10px;
+        }
+        img {
+            max-width: 200px;
+            border-radius: 10px;
+        }
+    </style>
+</head>
+<body>
+
+    <h2 id="product-title">Loading...</h2>
+    <img id="product-image" src="" alt="Product Image">
+    <h3 id="product-price"></h3>
+
+    <script>
+        async function fetchProduct() {
+            const shopName = "primal-health-sports-academy"; // Replace with your Shopify store name
+            const apiToken = "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"; // Replace with your Shopify API Token
+            const productId = "15029102575997"; // Replace with your Product ID
+
+            const url = `https://${shopName}.myshopify.com/admin/api/2024-01/products/${productId}.json`;
+
+            try {
+                const response = await fetch(url, {
+                    method: "GET",
+                    headers: {
+                        "X-Shopify-Access-Token": apiToken,
+                        "Content-Type": "application/json"
+                    }
+                });
+                const data = await response.json();
+                const product = data.product;
+
+                document.getElementById('product-title').innerText = product.title;
+                document.getElementById('product-image').src = product.image.src;
+                document.getElementById('product-price').innerText = `Price: $${product.variants[0].price}`;
+                document.getElementById('product-container').style.display = "block";
+            } catch (error) {
+                console.error("Error fetching product:", error);
+                document.getElementById('product-title').innerText = "Error loading product";
+            }
+        }
+
+        fetchProduct();
+    </script>
+
+</body>
+</html>
