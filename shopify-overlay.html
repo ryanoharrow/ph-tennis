@@ -7,71 +7,82 @@
     <style>
         body {
             font-family: Arial, sans-serif;
-            color: white;
+            color: black;
             text-align: center;
-            background: transparent;
+            background: #f4f4f4;
+            padding: 20px;
         }
         #product-container {
-            display: block;
-            padding: 10px;
+            display: none;
+            padding: 20px;
+            border: 1px solid #ddd;
             border-radius: 10px;
+            background-color: white;
+            box-shadow: 0px 0px 10px rgba(0, 0, 0, 0.1);
         }
         img {
-            max-width: 200px;
+            max-width: 100%;
             border-radius: 10px;
+        }
+        h2, h3 {
+            margin: 10px 0;
+        }
+        .error {
+            color: red;
         }
     </style>
 </head>
 <body>
 
+    <h2 id="product-title">Loading...</h2>
     <div id="product-container">
-        <h2 id="product-title">Loading...</h2>
-        <img id="product-image" src="" alt="Product Image" style="display:none;">
-        <h3 id="product-price">Price: Loading...</h3>
+        <img id="product-image" src="" alt="Product Image">
+        <h3 id="product-price"></h3>
     </div>
+    <p id="error-message" class="error"></p>
 
     <script>
-        async function fetchProduct() {
-            const url = "https://primal-health-sports-academy.myshopify.com/products/babolat-pure-aero-rafa-origin.json"; // Correct the URL with your product handle
+        // Function to fetch the product data from Shopify
+        async function fetchProductData() {
+            const url = "https://primal-health-sports-academy.myshopify.com/products/babolat-pure-drive-2025.json"; // Replace with your actual product handle
 
             try {
                 const response = await fetch(url);
                 const data = await response.json();
                 const product = data.product;
 
-                // Check if the product title exists and update
-                if (product.title) {
-                    document.getElementById('product-title').innerText = product.title;
-                } else {
-                    document.getElementById('product-title').innerText = "Title Not Available";
-                }
+                // Handle product data and display
+                if (product) {
+                    document.getElementById('product-title').innerText = product.title || "Product Title Not Available";
+                    document.getElementById('product-price').innerText = `Price: £${product.variants[0].price || "N/A"}`;
+                    
+                    // Set the image
+                    if (product.images && product.images.length > 0) {
+                        document.getElementById('product-image').src = product.images[0].src;
+                    } else {
+                        document.getElementById('product-image').alt = "No Image Available";
+                    }
 
-                // Set the price
-                if (product.variants && product.variants[0].price) {
-                    document.getElementById('product-price').innerText = `Price: £${product.variants[0].price}`;
+                    // Show the product details
+                    document.getElementById('product-container').style.display = "block";
+                    document.getElementById('error-message').innerText = ""; // Clear any previous error message
                 } else {
-                    document.getElementById('product-price').innerText = "Price Not Available";
+                    showError("Product data is missing or invalid.");
                 }
-
-                // Set the product image (using the first image URL)
-                if (product.images && product.images.length > 0) {
-                    const imageUrl = product.images[0].src;
-                    const productImage = document.getElementById('product-image');
-                    productImage.src = imageUrl;
-                    productImage.style.display = "block"; // Show image once the URL is set
-                } else {
-                    document.getElementById('product-image').style.display = "none"; // Hide image if not available
-                }
-
             } catch (error) {
-                console.error("Error fetching product:", error);
-                document.getElementById('product-title').innerText = "Error loading product";
-                document.getElementById('product-price').innerText = "Error loading price";
+                showError("Error loading product data. Please try again later.");
+                console.error("Error fetching product data:", error);
             }
         }
 
-        // Run fetchProduct on page load
-        fetchProduct();
+        // Display an error message if something goes wrong
+        function showError(message) {
+            document.getElementById('error-message').innerText = message;
+            document.getElementById('product-container').style.display = "none"; // Hide product details in case of error
+        }
+
+        // Fetch product data when the page loads
+        window.onload = fetchProductData;
     </script>
 
 </body>
